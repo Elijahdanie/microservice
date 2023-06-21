@@ -17,10 +17,21 @@ export default class Service {
         })
     }
 
+    /**
+     * Register a handler for a path
+     * @param path 
+     * @param handler 
+     */
     async registerHandler(path: string, handler: (job: JobRequest)=>Promise<any>){
         this.handlers[path] = handler;
     }
 
+    /**
+     * Send data to a service
+     * @param service 
+     * @param path 
+     * @param data 
+     */
     async sendData(service: string, path: string, data: any){
         let queue = new Queue(service);
         await queue.add({path, data});

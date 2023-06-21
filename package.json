@@ -1,7 +1,7 @@
 {
-  "name": "microservice",
-  "version": "1.0.0",
-  "description": "",
+  "name": "microservice-redis-net",
+  "version": "1.0.1",
+  "description": "This package helps services communicate with each other using redis",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
