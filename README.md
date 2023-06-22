@@ -11,7 +11,7 @@ $ npm install microservice-redis-net
 ## 2. Import
 
 ```typescript
-import Service from 'microservice-redis-net';
+const Service  = require('microservice-redis-net');
 
 const service = new Service("service-name");
 
