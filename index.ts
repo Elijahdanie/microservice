@@ -1,4 +1,5 @@
 import Queue from 'bull';
+import { JobRequest } from './microservice-redis-net';
 
 export default class Service {
 
@@ -36,10 +37,4 @@ export default class Service {
         let queue = new Queue(service);
         await queue.add({path, data});
     }
-}
-
-
-export interface JobRequest {
-    path: string;
-    data: any
 }
