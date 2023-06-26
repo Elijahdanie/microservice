@@ -15,7 +15,7 @@ declare class Service {
 
   registerHandler(path: string, handler: (job: JobRequest) => Promise<any>): Promise<void>;
 
-  sendData(service: string, path: string, data: any, options?: Bull.JobOptions): Promise<void>;
+  send(path: string, data: any, options?: Bull.JobOptions): Promise<void>;
 }
 
 export = Service;
