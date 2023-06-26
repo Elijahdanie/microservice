@@ -6,8 +6,19 @@ const Queue = require('bull');
  */
 class Service {
 
+    /**
+     * The queue that will be used to send and receive data
+     */
     queue;
+
+    /**
+     * The handlers that will be used to process data
+     */
     handlers;
+
+    /**
+     * The name of the service
+     */
     servicName;
 
     constructor(name, config){
@@ -37,7 +48,7 @@ class Service {
      * @param path 
      * @param data 
      */
-     async sendData(path, data, options){
+     async send(path, data, options){
         await this.queue.add({path, data}, options);
     }
 }
