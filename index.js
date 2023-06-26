@@ -1,13 +1,18 @@
 const Queue = require('bull');
 
 
+/**
+ * This abstracts a service that can send, receive and process data
+ */
 class Service {
 
     queue;
     handlers;
+    servicName;
 
     constructor(name, config){
         this.handlers = {};
+        this.servicName = name;
         this.queue = new Queue(name, config);
         this.queue.process(async (job)=>{
             const handler = this.handlers[job.data.path];
@@ -26,15 +31,14 @@ class Service {
         this.handlers[path] = handler;
     }
 
-    /**
+     /**
      * Send data to a service
      * @param service 
      * @param path 
      * @param data 
      */
-    async sendData(service, path, data, options){
-        let queue = new Queue(service);
-        await queue.add({path, data}, options);
+     async sendData(path, data, options){
+        await this.queue.add({path, data}, options);
     }
 }
 

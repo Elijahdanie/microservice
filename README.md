@@ -21,7 +21,7 @@ service.registerHandler("/email", async (job: JobRequest)=>{
 });
 
 //send message
-service.send("service-name", "/email", {
+service.send("/email", {
     to: "example@email.com",
     subject: "Hello",
     body: "Hello World"
