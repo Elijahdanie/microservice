@@ -1,4 +1,5 @@
 const Queue = require('bull');
+const EventHandler = require('./event');
 
 
 /**
@@ -17,18 +18,36 @@ class Service {
     handlers;
 
     /**
+     * The event handlers that will be used to process data
+     */
+    eventHandler;
+
+    /**
      * The name of the service
      */
     servicName;
+
+    defaultOptions = {
+        attempts: 3,
+        removeOnComplete: true,
+        removeOnFail: true
+    }
 
     constructor(name, config){
         this.handlers = {};
         this.servicName = name;
         this.queue = new Queue(name, config);
-        this.queue.process(async (job)=>{
-            const handler = this.handlers[job.data.path];
+        this.eventHandler = new EventHandler(config, this.defaultOptions);
+        this.queue.process(async (job, done)=>{
+            const {path, data, IsEventCall} = job.data;
+            const handler = this.handlers[path];
             if(handler){
-                return handler(job.data);
+                // fire event here
+                handler(data);
+                done();
+            }
+            if(!IsEventCall){
+                await this.eventHandler.Invoke(job.data);
             }
         })
     }
@@ -42,14 +61,21 @@ class Service {
         this.handlers[path] = handler;
     }
 
-     /**
+    async subscribe(path, callback){
+        this.handlers[path] = callback;
+        this.eventHandler.registerEvent(path, this.servicName);
+    }
+
+    async InvokeEvent(path, eventArgs){
+        await this.eventHandler.Invoke({path, data: eventArgs});
+    }
+
+    /**
      * Send data to a service
-     * @param service 
-     * @param path 
-     * @param data 
      */
-     async send(path, data, options){
-        await this.queue.add({path, data}, options);
+    async send(service, path, data, options){
+        let queue =  this.eventHandler.fetchService(service);
+        await queue.add({path, data}, options ? options : this.defaultOptions);
     }
 }
 

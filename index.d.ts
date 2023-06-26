@@ -14,8 +14,12 @@ declare class Service {
   constructor(name: string, config?: QueueOptions);
 
   registerHandler(path: string, handler: (job: JobRequest) => Promise<any>): Promise<void>;
+  
+  InvokeEvent(path: string, data: any): Promise<Job<any>>;
 
-  send(path: string, data: any, options?: Bull.JobOptions): Promise<void>;
+  subscribe(path: string, handler: (job: JobRequest) => Promise<any>): Promise<void>;
+  
+  send(service: string, path: string, data: any, options?: Bull.JobOptions): Promise<void>;
 }
 
 export = Service;
