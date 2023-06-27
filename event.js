@@ -17,7 +17,6 @@ class EventHandler {
         const {path, data} = job;
         // get the list of services that are listening to this event
         const services = await this.redisDb.smembers(path);
-        console.log(services, 'services GOTTEN', path);
         // for each service, send the data
         for(const service of services){
             let serviceQueue = this.fetchService(service);

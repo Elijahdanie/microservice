@@ -66,7 +66,7 @@ class Service {
         this.eventHandler.registerEvent(path, this.servicName);
     }
 
-    async InvokeEvent(path, eventArgs){
+    async invokeEvent(path, eventArgs){
         await this.eventHandler.Invoke({path, data: eventArgs});
     }
 

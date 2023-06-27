@@ -1,20 +1,17 @@
-const exec = require('child_process').exec;
 
 const Service = require('../index');
 
 const logger = new Service('logger');
 
 (async ()=>{
+    await logger.subscribe('createUser', async (data)=>{
+        console.log("logged user created", data.name);
+    });
     await logger.subscribe('sendMail', async (data)=>{
-        console.log("logged mail", data);
+        console.log("logged mail sent to", data.to);
     });
-
-    await logger.send('email', 'sendMail',{
-        to: 'youremail@email.com',
-        subject: 'Hello',
-        text: 'Hello world',
-        html: '<b>Hello world</b>'
+    await logger.subscribe('broadcast', async (data)=>{
+        console.log("logger recieved on broadcast", data);
     });
-    console.log("sent mail");
 })()
 

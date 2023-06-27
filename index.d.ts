@@ -1,7 +1,7 @@
 import Bull, { Job, QueueOptions } from 'bull';
 
 interface JobRequest {
-    path: string;
+    func: string;
     data: any;
   }
 
@@ -13,13 +13,18 @@ declare class Service {
 
   constructor(name: string, config?: QueueOptions);
 
-  registerHandler(path: string, handler: (job: JobRequest) => Promise<any>): Promise<void>;
+  /**
+   * register a handler for a function
+   * @param path 
+   * @param handler 
+   */
+  registerHandler(func: string, handler: (job: JobRequest) => Promise<any>): Promise<void>;
   
-  InvokeEvent(path: string, data: any): Promise<Job<any>>;
+  invokeEvent(func: string, data: any): Promise<Job<any>>;
 
-  subscribe(path: string, handler: (job: JobRequest) => Promise<any>): Promise<void>;
+  subscribe(func: string, handler: (data: any) => Promise<any>): Promise<void>;
   
-  send(service: string, path: string, data: any, options?: Bull.JobOptions): Promise<void>;
+  send(service: string, func: string, data: any, options?: Bull.JobOptions): Promise<void>;
 }
 
 export = Service;

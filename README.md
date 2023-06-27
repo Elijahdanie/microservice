@@ -1,11 +1,13 @@
 
+# microservice-redis-net
+
+[![npm version](https://badge.fury.io/js/microservice-redis-net.svg)](https://www.npmjs.com/package/microservice-redis-net)
 
 # USAGE
 
 This is a simple microservice library that uses redis pub/sub to allow services to communicate with each other in a simple way.
-A service can have multiple functions registered to it, and a function can have multiple,services registered to it.
-Service run on a single redis instance, so you can have multiple services running on different machines, and they will all be able to communicate with each other.
-A service runs on a single process so you cannot have multiple services running on the same process
+Preferable to have all your services connected to a single redis instance, so you can have multiple services running on different machines, and they will all be able to communicate with each other.
+You can only register handlers for one service on a single node instance, so you cannot have multiple services running on the same node instance.
 
 ## 1. Install
 
@@ -20,21 +22,21 @@ import Service from 'microservice-redis-net';
 ```
 
 ## 3. Register Handler
-Register a function on a service to recieve jobs sent to that function.
+Register a route on a service to recieve jobs sent to that route.
 ```typescript
 
-const reciever = new Service("reciever");
+const emailService = new Service("email");
 
 // register handler
-reciever.registerHandler("/email", async (job: JobRequest)=>{
+emailService.registerHandler("/email", async (job: JobRequest)=>{
     console.log('recieved job', job);
     return {status: "ok"};
 });
 
 ```
 
-## 4. Send Job
-You can send a data to a specific function on a service
+## 4. Send Job to Route
+You can send a data to a specific route on a service
 ```typescript
 const sender = new Service("sender");
 
@@ -46,8 +48,8 @@ sender.send("reciever", "/email", {
 })
 ```
 
-## 5. Subscribe to Function
-You can subscribe to a function and recieve all jobs sent to that function.
+## 5. Subscribe to Route
+You can subscribe to a route and recieve all jobs sent to that route.
 ```typescript
 const subscriber = new Service("subscriber");
 
@@ -58,12 +60,23 @@ subscriber.subscribe("/email", (job: JobRequest)=>{
 });
 ```
 
-## 6. Invoke Function
-This invokes the function "/email" and sends the data for all subscribers to recieve,
-if you want to send a job to a specific service use the send function.
+## 6. Invoke Event
+You can invoke an event on a service, and all subscribers to that event will recieve the data.
 ```typescript
-subscriber.invoke("/email", {
-    to: "example@email.com",
-    subject: "Hello",
-    body: "Hello World"
+const storeBuilder = new Service("builder");
+
+// invoke event
+storeBuilder.invokeEvent("builtStore", {
+    storeId: "1234",
+    storeName: "My Store"
+})
+
+const emailService = new Service("email");
+
+// subscribe to event
+emailService.subscribe("builtStore", (data: any)=>{
+    console.log('recieved event on builtStore', data);
+    // send email to store owner
 });
+```
+```
