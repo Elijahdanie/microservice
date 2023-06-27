@@ -1,7 +1,5 @@
 # microservice-redis-net
 
-# microservice-redis-net
-
 [![npm version](https://badge.fury.io/js/microservice-redis-net.svg)](https://www.npmjs.com/package/microservice-redis-net)
 
 # USAGE
