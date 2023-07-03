@@ -1,7 +1,6 @@
 const Queue = require('bull');
 const EventHandler = require('./event');
 
-
 /**
  * This abstracts a service that can send, receive and process data
  */
@@ -77,6 +76,27 @@ class Service {
         let queue =  this.eventHandler.fetchService(service);
         await queue.add({path, data}, options ? options : this.defaultOptions);
     }
+
+    serviceFunction = (target, name, descriptor) => {
+        const original = descriptor.value;
+        const paramNames = Service.getParameterNames(original);
+        this.registerHandler(name, original);
+        console.log(paramNames);
+        // name is the name of the function
+        // paramNames are the names of the parameters
+    
+        // need a reference to a redisStore
+        return descriptor;
+    }
+
+    static getParameterNames(func) {
+        const match = func.toString().match(/^async\s*\w+\s*\((.*?)\)/);
+        if (match && match[1]) {
+            return match[1].split(',').map(param => param.trim());
+        }
+        return [];
+    }
 }
 
-module.exports = Service;
+// export Service as default and serviceFunction as a named export
+module.exports = Service; 

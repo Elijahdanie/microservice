@@ -5,6 +5,9 @@ interface JobRequest {
     data: any;
   }
 
+  //declare a decorator
+
+
 declare class Service {
   queue: Bull.Queue;
   handlers: {
@@ -25,6 +28,8 @@ declare class Service {
   subscribe(func: string, handler: (data: any) => Promise<any>): Promise<void>;
   
   send(service: string, func: string, data: any, options?: Bull.JobOptions): Promise<void>;
+
+  serviceFunction(target: any, name: string, descriptor: PropertyDescriptor): PropertyDescriptor;  
 }
 
 export = Service;
