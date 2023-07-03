@@ -78,9 +78,8 @@ class Service {
     }
 
     serviceFunction = (target, name, descriptor) => {
-        const original = descriptor.value;
         const paramNames = Service.getParameterNames(original);
-        this.registerHandler(name, original);
+        this.registerHandler(name, descriptor.value);
         console.log(paramNames);
         // name is the name of the function
         // paramNames are the names of the parameters
