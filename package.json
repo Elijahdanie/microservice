@@ -1,6 +1,6 @@
 {
   "name": "microservice-redis-net",
-  "version": "1.0.13",
+  "version": "1.0.15",
   "type": "commonjs",
   "description": "This package helps services communicate with each other using redis",
   "main": "index.js",

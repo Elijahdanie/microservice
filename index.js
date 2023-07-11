@@ -39,15 +39,20 @@ class Service {
         this.queue = new Queue(name, config);
         this.eventHandler = new EventHandler(config, this.defaultOptions);
         this.queue.process(async (job, done)=>{
-            const {path, data, IsEventCall} = job.data;
-            const handler = this.handlers[path];
-            if(handler){
-                // fire event here
-                handler(data);
+            try {
+                const {path, data, IsEventCall} = job.data;
+                const handler = this.handlers[path];
+                if(handler){
+                    // fire event here
+                    handler(data);
+                    done();
+                }
+                if(!IsEventCall){
+                    await this.eventHandler.Invoke(job.data);
+                }
                 done();
-            }
-            if(!IsEventCall){
-                await this.eventHandler.Invoke(job.data);
+            } catch (error) {
+                done(error);
             }
         })
     }

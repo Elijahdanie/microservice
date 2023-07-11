@@ -18,7 +18,7 @@ declare class Service {
    * @param path 
    * @param handler 
    */
-  registerHandler(func: string, handler: (job: JobRequest) => Promise<any>): Promise<void>;
+  registerHandler(func: string, handler: (data: any) => Promise<any>): Promise<void>;
   
   invokeEvent(func: string, data: any): Promise<Job<any>>;
 
