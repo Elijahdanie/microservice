@@ -56,6 +56,11 @@ cluster-key-slot@^1.1.0:
   resolved "https://registry.yarnpkg.com/cluster-key-slot/-/cluster-key-slot-1.1.2.tgz#88ddaa46906e303b5de30d3153b7d9fe0a0c19ac"
   integrity sha512-RMr0FhtfXemyinomL4hrWcYJxmX6deFdCxpJzhDttxgO1+bcCnkk+9drydLVDmAMG7NE6aN/fl4F7ucU/90gAA==
 
+commander@9.0.0:
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-9.0.0.tgz#86d58f24ee98126568936bd1d3574e0308a99a40"
+  integrity sha512-JJfP2saEKbQqvW+FI93OYUB4ByV5cizMpFMiiJI8xDbBvQvSkIk0VvQdn1CZ8mqAO8Loq2h0gYTYtDFUZUeERw==
+
 cron-parser@^4.2.1:
   version "4.8.1"
   resolved "https://registry.yarnpkg.com/cron-parser/-/cron-parser-4.8.1.tgz#47062ea63d21d78c10ddedb08ea4c5b6fc2750fb"
@@ -126,6 +131,14 @@ luxon@^3.2.1:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/luxon/-/luxon-3.3.0.tgz#d73ab5b5d2b49a461c47cedbc7e73309b4805b48"
   integrity sha512-An0UCfG/rSiqtAIiBPO0Y9/zAnHUZxAMiCpTd5h2smgsj7GGmcenvrvww2cqNA8/4A5ZrD1gJpHN2mIHZQF+Mg==
+
+mrn-cli@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/mrn-cli/-/mrn-cli-1.0.0.tgz#d598d31919e54b02f6850264902d180aa2dfe41c"
+  integrity sha512-GrmeaXYStj2uWL4hKxzUQhMo9w3WVHOuboJ7Bp7jTGqPk6vr5sHvATEugevUtD9CoIEOOgH1WncUSFKuK0Zkrw==
+  dependencies:
+    commander "9.0.0"
+    ioredis "^5.3.2"
 
 ms@2.1.2:
   version "2.1.2"

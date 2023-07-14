@@ -1,0 +1,9 @@
+{
+    "application": "smartbloks",
+    "queue": {
+        "redis": {
+            "host": "localhost",
+            "port": 6379
+        }
+    }
+}
