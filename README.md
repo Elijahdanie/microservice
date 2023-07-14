@@ -10,7 +10,7 @@ You can only register handlers for one service on a single node instance, so you
 
 To autogenerate code from services install the cli tool
 ```bash
-$ npm install microservice-stealth
+$ npm install mrn-cli
 ```
 
 ## 1. Install
