@@ -118,33 +118,26 @@ to you
 ```typescript
 import {createService} from 'microservice-redis-net';
 
-(async()=>{
-    const service = await createService ();
-    
-    service.registerFunction(async function exampleFunction (id: string, user:any)=>{
-        console.log('recieved job', job);
-        return {status: "ok"};
-    });
+const service = createService ();
 
-    // register a function with a route
-    service.registerHandler('route', async (args)=>{
-        console.log('recieved job', args;
-        return {status: "ok"};
-    });
-
-    // subscribe to an event or function
-    service.subscribe('event_route', async (args)=>{
-        console.log('recieved job', args);
-        return {status: "ok"};
-    });
-
-
-    //send a job to the service
-    await service.send('service', 'route', {data: "example data"});
-
-    //invoke event
-    await service.invokeEvent('event_route', {data: "example data"});
-})();
+service.registerFunction(async function exampleFunction(id:string, user:any)=>{
+    console.log('recieved job', job);
+    return {status: "ok"};
+});
+// register a function with a route
+service.registerHandler('route', async (args)=>{
+    console.log('recieved job', args;
+    return {status: "ok"};
+});
+// subscribe to an event or function
+service.subscribe('event_route', async (args)=>{
+    console.log('recieved job', args);
+    return {status: "ok"};
+});
+//send a job to the service
+await service.send('service', 'route', {data: "exampledata"});
+//invoke event
+await service.invokeEvent('event_route', {data: "exampledata"});
 ```
 
 ## NOTE

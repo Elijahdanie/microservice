@@ -132,10 +132,10 @@ luxon@^3.2.1:
   resolved "https://registry.yarnpkg.com/luxon/-/luxon-3.3.0.tgz#d73ab5b5d2b49a461c47cedbc7e73309b4805b48"
   integrity sha512-An0UCfG/rSiqtAIiBPO0Y9/zAnHUZxAMiCpTd5h2smgsj7GGmcenvrvww2cqNA8/4A5ZrD1gJpHN2mIHZQF+Mg==
 
-mrn-cli@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/mrn-cli/-/mrn-cli-1.0.0.tgz#d598d31919e54b02f6850264902d180aa2dfe41c"
-  integrity sha512-GrmeaXYStj2uWL4hKxzUQhMo9w3WVHOuboJ7Bp7jTGqPk6vr5sHvATEugevUtD9CoIEOOgH1WncUSFKuK0Zkrw==
+mrn-cli@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/mrn-cli/-/mrn-cli-1.0.1.tgz#dc6e0879bd6b00c3b9e1c256104208840db0c6fe"
+  integrity sha512-yzCOBqaVvevQ1PrBf0V3xCY6hQBNQZJN6r9wCrSwdyLLrstWETWHVPOZcim3v7mYPkufvJ3zvagdDmhJTnSk6w==
   dependencies:
     commander "9.0.0"
     ioredis "^5.3.2"
@@ -184,9 +184,9 @@ redis-parser@^3.0.0:
     redis-errors "^1.0.0"
 
 semver@^7.3.2:
-  version "7.5.2"
-  resolved "https://registry.yarnpkg.com/semver/-/semver-7.5.2.tgz#5b851e66d1be07c1cdaf37dfc856f543325a2beb"
-  integrity sha512-SoftuTROv/cRjCze/scjGyiDtcUyxw1rgYQSZY7XTmtR5hX+dm76iDbTH8TkLPHCQmlbQVSSbNZCPM2hb0knnQ==
+  version "7.5.4"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-7.5.4.tgz#483986ec4ed38e1c6c48c34894a9182dbff68a6e"
+  integrity sha512-1bCSESV6Pv+i21Hvpxp3Dx+pSD8lIPt8uVjRrxAUt/nbswYc+tK6Y2btiULjd4+fnq15PX+nqQDC7Oft7WkwcA==
   dependencies:
     lru-cache "^6.0.0"
 
