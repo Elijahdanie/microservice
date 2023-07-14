@@ -24,110 +24,132 @@ With the cli tool you can run the follow command on the terminal to generate a c
 ```bash
 $ mrn init <application-name>
 ```
-
+edit the redis configuration to point to your redis server
 
 ## 2. Import and create Service
 
-
-Import the createService function and create a service passing in the application and service name.
-You only need to do this in the absense of a config file.
 ```typescript
 import {createService} from 'microservice-redis-net';
 
 // example 
-const exampleService = createService ({
-    application: "mrn-application",
-    service: "email",
-    queue: {
-        
+createService ();
+```
+
+yopu can also pass in a config object
+```typescript
+import {createService} from 'microservice-redis-net';
+
+// example
+createService ({
+    application: "example",
+    service: "example-service",
+    queue:{
+        redis:{
+            host: "localhost",
+            port: 6379
+        }
     }
 });
 ```
 
-## 3. Register Handler
-Register a route on a service to recieve jobs sent to that route.
+Bind the decorators to your class methods
 ```typescript
+import {createService, registerFunction, subscribeFunction} from 'microservice-redis-net';
 
-// register handler by string route
-emailService.registerHandler("/email", async (args)=>{
-    console.log('recieved job', args);
-    return {status: "ok"};
-});
+createService ();
 
-// register hander by named function
-emailService.registerFunction(async function email (args)=>{
-    console.log('recieved job', job);
-    return {status: "ok"};
-});
+class ExampleService {
 
-// register by decorator
-import {serviceFunction} from 'microservice-redis-net';
-
-class Emailer {
-
-    @serviceFunction
-    email(args){
-        console.log('recieved job', job);
+    @registerFunction
+    async exampleFunction (id: string, name: string, created: boolean){
+        console.log('recieved job', id, name, created);
         return {status: "ok"};
     }
-}
-
-```
-
-## 4. Send Job to Route
-You can send a data to a specific route on a service
-```typescript
-const sender = new Service("sender");
-
-// send job
-sender.send("reciever", "/email", {
-    to: "example@email.com",
-    subject: "Hello",
-    body: "Hello World"
-})
-```
-
-## 5. Subscribe to Route
-You can subscribe to a route and recieve all jobs sent to that route.
-```typescript
-const subscriber = new Service("subscriber");
-
-// subscribe to job
-subscriber.subscribe("/email", (args)=>{
-    console.log('recieved job', args);
-    return {status: "ok"};
-});
-
-// subscribe using decorator
-import {subscribeFunction} from 'microservice-redis-net';
-
-class Subscriber {
 
     @subscribeFunction
-    email(args){
+    async exampleSubscribe (args){
+        console.log('recieved job', args);
+        return {status: "ok"};
+    }
+}
+```
+
+## 3. Invoke functions
+ using mrn-cli run the following command to generate a client
+
+```bash
+$ mrn pull
+```
+
+Import the client and invoke the function
+```typescript
+
+import example, {exampleSubscribe} from './mrn-application/example';
+
+// call service function
+exmple.exampleFunction({data: "example data"})
+    .then((result) => {
+        console.log('result', result);
+    })
+    .catch((err) => {
+        console.log('error', err);
+    });
+
+// invoke the event Subscribed
+example.Invoke(exampleSubscribe, {data: "example data});
+
+
+// can also specify an event from the auto generated code
+class ExampleService {
+
+    @subscribeFunction(exampleSubscribe)
+    async hookEVent(args: any){
         console.log('recieved job', job);
         return {status: "ok"};
     }
 }
 ```
 
-## 6. Invoke Event
-You can invoke an event on a service, and all subscribers to that event will recieve the data.
+
+## Other Features
+If you're not making use of decoratorsm, the following apis are also available
+to you
+
 ```typescript
-const storeBuilder = new Service("builder");
+import {createService} from 'microservice-redis-net';
 
-// invoke event
-storeBuilder.invokeEvent("builtStore", {
-    storeId: "1234",
-    storeName: "My Store"
-})
+(async()=>{
+    const service = await createService ();
+    
+    service.registerFunction(async function exampleFunction (id: string, user:any)=>{
+        console.log('recieved job', job);
+        return {status: "ok"};
+    });
 
-const emailService = new Service("email");
+    // register a function with a route
+    service.registerHandler('route', async (args)=>{
+        console.log('recieved job', args;
+        return {status: "ok"};
+    });
 
-// subscribe to event
-emailService.subscribe("builtStore", (data: any)=>{
-    console.log('recieved event on builtStore', data);
-    // send email to store owner
-});
+    // subscribe to an event or function
+    service.subscribe('event_route', async (args)=>{
+        console.log('recieved job', args);
+        return {status: "ok"};
+    });
+
+
+    //send a job to the service
+    await service.send('service', 'route', {data: "example data"});
+
+    //invoke event
+    await service.invokeEvent('event_route', {data: "example data"});
+})();
 ```
-```
+
+## NOTE
+- If you're using typescript, you need to enable the experimentalDecorators and emitDecoratorMetadata compiler options in your tsconfig.json file.
+
+- Run mrn init to generate a config file so you can manage your configuration in one place
+
+- Run mrn pull to generate a client file to invoke functions
