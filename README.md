@@ -8,10 +8,16 @@ This is a simple microservice library that uses redis pub/sub to allow services 
 Preferable to have all your services connected to a single redis instance, so you can have multiple services running on different machines, and they will all be able to communicate with each other.
 You can only register handlers for one service on a single node instance, so you cannot have multiple services running on the same node instance.
 
+To autogenerate code from services install the cli tool
+```bash
+$ npm install microservice-stealth
+```
+
 ## 1. Install
 
 ```bash
 $ npm install microservice-redis-net
+$ yarn add microservice-redis-net
 ```
 
 ## 2. Import
@@ -26,11 +32,29 @@ Register a route on a service to recieve jobs sent to that route.
 
 const emailService = new Service("email");
 
-// register handler
-emailService.registerHandler("/email", async (job: JobRequest)=>{
+// register handler by string route
+emailService.registerHandler("/email", async (args)=>{
+    console.log('recieved job', args);
+    return {status: "ok"};
+});
+
+// register hander by named function
+emailService.registerFunction(async function email (args)=>{
     console.log('recieved job', job);
     return {status: "ok"};
 });
+
+// register by decorator
+import {serviceFunction} from 'microservice-redis-net';
+
+class Emailer {
+
+    @serviceFunction
+    email(args){
+        console.log('recieved job', job);
+        return {status: "ok"};
+    }
+}
 
 ```
 
@@ -53,10 +77,22 @@ You can subscribe to a route and recieve all jobs sent to that route.
 const subscriber = new Service("subscriber");
 
 // subscribe to job
-subscriber.subscribe("/email", (job: JobRequest)=>{
-    console.log('recieved job', job);
+subscriber.subscribe("/email", (args)=>{
+    console.log('recieved job', args);
     return {status: "ok"};
 });
+
+// subscribe using decorator
+import {subscribeFunction} from 'microservice-redis-net';
+
+class Subscriber {
+
+    @subscribeFunction
+    email(args){
+        console.log('recieved job', job);
+        return {status: "ok"};
+    }
+}
 ```
 
 ## 6. Invoke Event

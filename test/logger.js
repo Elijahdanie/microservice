@@ -1,14 +1,20 @@
 
-const Service = require('../index');
+const {createService} = require('../index');
 
-const logger = new Service('logger');
 
 (async ()=>{
+
+    const logger = await createService({
+        service: 'logger',
+        application: 'mrn-application'
+    });
+
     await logger.subscribe('createUser', async (data)=>{
-        console.log("logged user created", data.name);
+        //console.log("logged user created", data.name);
     });
     await logger.subscribe('sendMail', async (data)=>{
         console.log("logged mail sent to", data.to);
+        //await artifialPromise(data);
     });
     await logger.subscribe('broadcast', async (data)=>{
         console.log("logger recieved on broadcast", data);

@@ -1,6 +1,9 @@
-const Service = require('../index');
+const {createService} = require('../index');
 const http = require('http');
-const authService = new Service('auth');
+const authService = createService({
+    service: 'auth',
+    application: 'mrn-application'
+});
 
 authService.subscribe('broadcast', async (data)=>{
     console.log("Auth recieved on broadcast", data);
@@ -27,6 +30,6 @@ http.createServer(async (req, res) => {
         default:
             res.end("Not Found");
     }
-}).listen(3000, ()=>{
-    console.log("Server started at 3000");
+}).listen(3001, ()=>{
+    console.log("Server started at 3001");
 });
