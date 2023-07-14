@@ -4,9 +4,7 @@
 
 # USAGE
 
-This is a simple microservice library that uses redis pub/sub to allow services to communicate with each other in a simple way.
-Preferable to have all your services connected to a single redis instance, so you can have multiple services running on different machines, and they will all be able to communicate with each other.
-You can only register handlers for one service on a single node instance, so you cannot have multiple services running on the same node instance.
+A simple wrapper around redis pub/sub to allow for easy microservice communication.
 
 To autogenerate code from services install the cli tool
 ```bash
