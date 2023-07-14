@@ -132,10 +132,10 @@ luxon@^3.2.1:
   resolved "https://registry.yarnpkg.com/luxon/-/luxon-3.3.0.tgz#d73ab5b5d2b49a461c47cedbc7e73309b4805b48"
   integrity sha512-An0UCfG/rSiqtAIiBPO0Y9/zAnHUZxAMiCpTd5h2smgsj7GGmcenvrvww2cqNA8/4A5ZrD1gJpHN2mIHZQF+Mg==
 
-mrn-cli@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/mrn-cli/-/mrn-cli-1.0.1.tgz#dc6e0879bd6b00c3b9e1c256104208840db0c6fe"
-  integrity sha512-yzCOBqaVvevQ1PrBf0V3xCY6hQBNQZJN6r9wCrSwdyLLrstWETWHVPOZcim3v7mYPkufvJ3zvagdDmhJTnSk6w==
+mrn-cli@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/mrn-cli/-/mrn-cli-1.0.3.tgz#df0ed605327bea0ccc5fe600d33746f32ffed5b3"
+  integrity sha512-nhU/aZfFHydUSygBjPxBlfJOhR7JLVrmFfr06rrqJQBMlSuzBKmAoIMvlN4XbltHHLI/lWCKbyRuPMQFi7F1ZA==
   dependencies:
     commander "9.0.0"
     ioredis "^5.3.2"

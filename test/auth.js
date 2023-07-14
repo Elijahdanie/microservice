@@ -5,6 +5,12 @@ const authService = createService({
     application: 'mrn-application'
 });
 
+class createUser {
+    name = "";
+    email = "";
+    password = "";
+}
+
 authService.subscribe('broadcast', async (data)=>{
     console.log("Auth recieved on broadcast", data);
 });
@@ -19,7 +25,7 @@ http.createServer(async (req, res) => {
             });
             req.on('end', async () => {
                 let userdata = JSON.parse(body);
-                await authService.invokeEvent('createUser', userdata);
+                await authService.Invoke(createUser, userdata);
                 res.end("User Created");
             });
             break;

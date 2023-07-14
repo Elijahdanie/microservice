@@ -35,11 +35,17 @@ declare class Service {
   
   invokeEvent(func: string, data: any): Promise<Job<any>>;
 
+  Invoke <T>(route: new()=>T, data: T): Promise<void>;
+
   subscribe(func: string, handler: (data: any) => Promise<any>): Promise<void>;
 
   send(service: string, func: string, data: any, options?: Bull.JobOptions): Promise<void>;
 
   sendDecorator(service: string, func: string, data: any, options?: Bull.JobOptions): Promise<void>;
+
+  subscribe <T>(route: new()=>T, callback: (data: T) => Promise<void>): Promise<void>;
+
+  call <T>(service: string, route: new()=>T, callback: (data: T) => Promise<void>): Promise<void>;
 }
 
 declare function serviceFunction(

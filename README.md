@@ -22,25 +22,26 @@ $ yarn add microservice-redis-net
 
 With the cli tool you can run the follow command on the terminal to generate a config file.
 ```bash
-$ mrn init <application-name>
+$ mrn init --application <name>
 ```
 edit the redis configuration to point to your redis server
 
 ## 2. Import and create Service
 
-```typescript
-import {createService} from 'microservice-redis-net';
-
-// example 
-createService ();
-```
-
-yopu can also pass in a config object
+Import the createService function and call it to create a service
 ```typescript
 import {createService} from 'microservice-redis-net';
 
 // example
-createService ({
+const exampleService = createService ();
+```
+
+You can also pass in a config object if the config file is not in the root directory
+```typescript
+import {createService} from 'microservice-redis-net';
+
+// example
+const exampleService = createService ({
     application: "example",
     service: "example-service",
     queue:{
@@ -78,7 +79,7 @@ class ExampleService {
  using mrn-cli run the following command to generate a client
 
 ```bash
-$ mrn pull
+$ npx mrn pull
 ```
 
 Import the client and invoke the function
@@ -95,11 +96,24 @@ exmple.exampleFunction({data: "example data"})
         console.log('error', err);
     });
 
+// can as well make a custom call
+import Service from 'microservice-redis-net';
+Service.instance.call(exampleSubscribe, {data: "example data"});
+
+// Can also invoke with the type function exampleSubscribe
 // invoke the event Subscribed
-example.Invoke(exampleSubscribe, {data: "example data});
+Service.instance.Invoke(exampleSubscribe, {data: "example data"});
 
+// or subscribe via the type function exampleSubscribe
+Service.instance.hook(exampleSubscribe, (args)=>{
+    console.log('recieved job', args);
+    return {status: "ok"};
+});
+```
+Using the types generated from the cli tool gives you access to parameters for the functions
 
-// can also specify an event from the auto generated code
+You can also specify an event from the auto generated code in the subscribe function
+```typescript
 class ExampleService {
 
     @subscribeFunction(exampleSubscribe)

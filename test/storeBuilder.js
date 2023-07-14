@@ -1,5 +1,11 @@
 const {createService} = require('../index');
 
+class getMail {
+    to = "";
+    subject = "";
+    body = "";
+}
+
 (async ()=>{
 
     const storeBuilder = await createService({
@@ -15,7 +21,7 @@ const {createService} = require('../index');
         console.log("Building store for", data.name);
 
         setTimeout(async() => {
-            await getMail(10, data);
+            await vgetMail(10, data);
         }, 1000);
         // send mail
     });
@@ -31,8 +37,8 @@ const {createService} = require('../index');
         await sendMail(count--, data);
     }
     
-    async function getMail(count, data){
-        const result = await storeBuilder.send('email','getMail', {
+    async function vgetMail(count, data){
+        const result = await storeBuilder.call('email', getMail, {
             to: data.email,
             subject: "Welcome to our service",
             body: "Your store is ready"
@@ -40,6 +46,6 @@ const {createService} = require('../index');
         console.log("result", result, count);
         if(count === 0) return;
         count--;
-        await getMail(count, data);
+        await vgetMail(count, data);
     }
 })()

@@ -252,6 +252,15 @@ class Service {
         this.eventHandler.registerEvent(path, this.serviceName);
     }
 
+    async hook(route, callback) {
+        const type = route.name;
+        await this.subscribe(type, callback);
+    }
+
+    async call(service, route, data){
+        return await this.send(service, route.name, data);
+    }
+
     /**
      * Invoke an event
      * @param {*} path
@@ -259,6 +268,10 @@ class Service {
      */
     async invokeEvent(path, eventArgs) {
         await this.eventHandler.Invoke({ path, data: eventArgs });
+    }
+
+    async Invoke(route, eventArgs) {
+        await this.eventHandler.Invoke({ path: route.name, data: eventArgs });
     }
 
     /**
@@ -290,7 +303,6 @@ class Service {
         let queue = this.eventHandler.fetchService(service);
         await queue.add({ path, data, isDecorator: true }, options ? options : this.defaultOptions);
     }
-
 
     static getParameterNames(func) {
         const match = func.toString().match(/^async\s*\w+\s*\((.*?)\)/);
