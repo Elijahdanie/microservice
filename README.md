@@ -18,17 +18,35 @@ $ npm install microservice-redis-net
 $ yarn add microservice-redis-net
 ```
 
-## 2. Import
+## 2. Configuration
 
+With the cli tool you can run the follow command on the terminal to generate a config file.
+```bash
+$ mrn init <application-name>
+```
+
+
+## 2. Import and create Service
+
+
+Import the createService function and create a service passing in the application and service name.
+You only need to do this in the absense of a config file.
 ```typescript
-import Service from 'microservice-redis-net';
+import {createService} from 'microservice-redis-net';
+
+// example 
+const exampleService = createService ({
+    application: "mrn-application",
+    service: "email",
+    queue: {
+        
+    }
+});
 ```
 
 ## 3. Register Handler
 Register a route on a service to recieve jobs sent to that route.
 ```typescript
-
-const emailService = new Service("email");
 
 // register handler by string route
 emailService.registerHandler("/email", async (args)=>{
