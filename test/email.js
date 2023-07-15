@@ -4,7 +4,7 @@ let artifialPromise = (data)=>{
     return new Promise((resolve, reject)=>{
         setTimeout(() => {
             resolve(data);
-        }, 1000);
+        }, 3000);
     })
 }
 (async ()=>{
@@ -27,6 +27,7 @@ let artifialPromise = (data)=>{
 
     await emailService.registerFunction(async function getMail (data){
         await artifialPromise(data);
+        console.log("result");
         // find a way to send a response back to the caller
         return 'mail found';
     });

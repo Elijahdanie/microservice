@@ -22,7 +22,7 @@ class getMail {
 
         setTimeout(async() => {
             await vgetMail(10, data);
-        }, 1000);
+        }, 2000);
         // send mail
     });
 
@@ -38,12 +38,12 @@ class getMail {
     }
     
     async function vgetMail(count, data){
-        const result = await storeBuilder.call('email', getMail, {
+        storeBuilder.call('email', getMail, {
             to: data.email,
             subject: "Welcome to our service",
             body: "Your store is ready"
         });
-        console.log("result", result, count);
+        console.log("rapidly finnishings");
         if(count === 0) return;
         count--;
         await vgetMail(count, data);

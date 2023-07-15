@@ -107,14 +107,14 @@ class Service {
                         const result = await handler.callback(...(Object.values(data)));
 
                         // send response back to the sender
-                        let queue = this.eventHandler.fetchService(sender);
-                        await queue.add({ result, data: result, id, isResponse: true }, this.defaultOptions);
+                        //let queue = this.eventHandler.fetchService(sender);
+                        //await queue.add({ result, data: result, id, isResponse: true }, this.defaultOptions);
                     } else {
                         const result = await handler.callback(data);
 
                         // send response back to the sender
-                        let queue = this.eventHandler.fetchService(sender);
-                        await queue.add({ result, data: result, id, isResponse: true }, this.defaultOptions);   
+                        //let queue = this.eventHandler.fetchService(sender);
+                        //await queue.add({ result, data: result, id, isResponse: true }, this.defaultOptions);   
                     }
                     await this.eventHandler.Invoke(job.data);
                 }
@@ -342,12 +342,17 @@ const subscribeFunction = (instance) => {
 }
 
 const createService = (config) => {
+    if(Service.instance){
+        return Service.instance;
+    }
     Service.instance = new Service(config);
     return Service.instance;
 }
 
-// export Service as default and serviceFunction as a named export
+//export default Service;
+
 module.exports = {
+    Service,
     createService,
     serviceFunction,
     subscribeFunction,

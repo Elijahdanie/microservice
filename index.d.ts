@@ -13,11 +13,10 @@ interface JobRequest {
 
   //declare a decorator
 
-  declare const _default: Service;
 
 declare class Service {
   queue: Bull.Queue;
-  instance: Service;
+  static instance: Service;
   // handlers: {
   //   [path: string]: (job: JobRequest) => Promise<any>;
   // };
@@ -45,7 +44,7 @@ declare class Service {
 
   subscribe <T>(route: new()=>T, callback: (data: T) => Promise<void>): Promise<void>;
 
-  call <T>(service: string, route: new()=>T, callback: (data: T) => Promise<void>): Promise<void>;
+  call <T>(service: string, route: new()=>T, data: T): Promise<void>;
 }
 
 declare function serviceFunction(
@@ -56,12 +55,12 @@ declare function serviceFunction(
 
 declare function subscribeFunction<T>(instance: new ()=>T): (target: any, name: string, descriptor: PropertyDescriptor) => PropertyDescriptor;
 
+
+
 /**
  * set sync to true if you're using decorators
  * @param sync 
  * @param config 
  */
 declare function createService(config?: ServiceConfig): Service;
-export default _default;
-export as namespace module;
-export {createService, serviceFunction, subscribeFunction};
+export {Service, createService, serviceFunction, subscribeFunction};
