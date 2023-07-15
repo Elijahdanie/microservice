@@ -107,14 +107,14 @@ class Service {
                         const result = await handler.callback(...(Object.values(data)));
 
                         // send response back to the sender
-                        //let queue = this.eventHandler.fetchService(sender);
-                        //await queue.add({ result, data: result, id, isResponse: true }, this.defaultOptions);
+                        let queue = this.eventHandler.fetchService(sender);
+                        await queue.add({ result, data: result, id, isResponse: true }, this.defaultOptions);
                     } else {
                         const result = await handler.callback(data);
 
                         // send response back to the sender
-                        //let queue = this.eventHandler.fetchService(sender);
-                        //await queue.add({ result, data: result, id, isResponse: true }, this.defaultOptions);   
+                        let queue = this.eventHandler.fetchService(sender);
+                        await queue.add({ result, data: result, id, isResponse: true }, this.defaultOptions);   
                     }
                     await this.eventHandler.Invoke(job.data);
                 }
@@ -257,8 +257,8 @@ class Service {
         await this.subscribe(type, callback);
     }
 
-    async call(service, route, data){
-        return await this.send(service, route.name, data);
+    call(service, route, data){
+        return this.send(service, route.name, data);
     }
 
     /**
