@@ -3,6 +3,11 @@ const EventHandler = require('./event');
 const fs = require('fs');
 const {v4} = require('uuid');
 
+
+let serviceHandlerPromises = [];
+
+let eventRegisterPromises = [];
+
 /**
  * This abstracts a service that can send, receive and process data
  */
@@ -39,10 +44,6 @@ class Service {
     rootKey;
 
     instance;
-
-    serviceHandlerPromises = [];
-
-    eventRegisterPromises = [];
 
     /**
      * The name of the service
@@ -146,11 +147,11 @@ class Service {
 
         await this.eventHandler.init(this.rootKey);
 
-        await Promise.all(this.serviceHandlerPromises.map(async (promise) => {
+        await Promise.all(serviceHandlerPromises.map(async (promise) => {
             await promise();
         }));
 
-        await Promise.all(this.eventRegisterPromises.map(async (promise) => {
+        await Promise.all(eventRegisterPromises.map(async (promise) => {
             await promise();
         }));
 
@@ -314,7 +315,7 @@ class Service {
 }
 
 const serviceFunction = (target, name, descriptor) => {
-    Service.instance.serviceHandlerPromises.push(async () => {
+    serviceHandlerPromises.push(async () => {
 
         const paramNames = Service.getParameterNames(descriptor.value);
 
@@ -329,7 +330,7 @@ const serviceFunction = (target, name, descriptor) => {
 const subscribeFunction = (instance) => {
     return (target, name, descriptor) => {
         //console.log(instance.name, 'SUBSCRIBE');
-        Service.instance.eventRegisterPromises.push(async () => {
+        eventRegisterPromises.push(async () => {
             if (instance) {
                 Service.instance.subscribe(instance.name, descriptor.value);
             }
