@@ -54,7 +54,7 @@ class Service {
             host: 'localhost',
             port: 6379
         },
-        JobOptions: {
+        defaultJobOptions: {
             attempts: 2,
             removeOnComplete: true,
             removeOnFail: true
@@ -86,7 +86,7 @@ class Service {
         }
         this.rootKey = `mrn:${config.application}:${this.serviceName}`;
         this.queue = new Queue(this.serviceName, config.queue ? config.queue : this.queueOptions);
-        this.eventHandler = new EventHandler(config, this.queueOptions.JobOptions);
+        this.eventHandler = new EventHandler(config, this.queueOptions.defaultJobOptions);
 
         this.queue.process(async (job, done) => {
             const { path, data, IsEventCall, id, sender, isResponse } = job.data;
@@ -108,13 +108,13 @@ class Service {
 
                         // send response back to the sender
                         let queue = this.eventHandler.fetchService(sender);
-                        await queue.add({ result, data: result, id, isResponse: true }, this.defaultOptions);
+                        await queue.add({ result, data: result, id, isResponse: true }, this.queueOptions.defaultJobOptions);
                     } else {
                         const result = await handler.callback(data);
 
                         // send response back to the sender
                         let queue = this.eventHandler.fetchService(sender);
-                        await queue.add({ result, data: result, id, isResponse: true }, this.defaultOptions);   
+                        await queue.add({ result, data: result, id, isResponse: true }, this.queueOptions.defaultJobOptions);   
                     }
                     await this.eventHandler.Invoke(job.data);
                 }
@@ -280,7 +280,7 @@ class Service {
     async send(service, path, data, options) {
         let queue = this.eventHandler.fetchService(service);
         let id = v4();
-        await queue.add({ path, data, id, sender: this.serviceName }, options ? options : this.defaultOptions);
+        await queue.add({ path, data, id, sender: this.serviceName }, options ? options : this.queueOptions.defaultJobOptions);
         return await this.processCallback(id);
     }
 
@@ -301,7 +301,7 @@ class Service {
      */
     async sendDecorator(service, path, data, options) {
         let queue = this.eventHandler.fetchService(service);
-        await queue.add({ path, data, isDecorator: true }, options ? options : this.defaultOptions);
+        await queue.add({ path, data, isDecorator: true }, options ? options : this.queueOptions.defaultJobOptions);
     }
 
     static getParameterNames(func) {
