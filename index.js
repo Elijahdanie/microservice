@@ -45,6 +45,10 @@ class Service {
 
     instance;
 
+    container;
+    
+    classMap = {};
+
     /**
      * The name of the service
      */
@@ -62,9 +66,10 @@ class Service {
         }
     }
 
-    constructor(config) {
+    constructor(config, container) {
 
         this.handlers = {};
+        this.container = container;
 
         if (!config) {
             config = this.getConfig();
@@ -76,7 +81,6 @@ class Service {
         this.serviceName = config.service ? config.service : this.getServiceName();
 
         if (Service.instance && Service.instance.serviceName === this.serviceName) {
-            // console.log('An instance for this service is already running');
             console.error(`WARNING: only one instance of ${this.serviceName}'s Service can be running in a single node instance`);
             return;
         }
@@ -90,9 +94,8 @@ class Service {
         this.eventHandler = new EventHandler(config, this.queueOptions.defaultJobOptions);
 
         this.queue.process(async (job, done) => {
-            const { path, data, IsEventCall, id, sender, isResponse } = job.data;
+            const { path, data, IsEventCall, id, sender, isResponse, target } = job.data;
             
-            // check if it is a response call
             if(isResponse){
                 await this.eventHandler.handleResponse(id, data);
                 done();
@@ -108,15 +111,19 @@ class Service {
                         const result = await handler.callback(...(Object.values(data)));
 
                         // send response back to the sender
-                        let queue = this.eventHandler.fetchService(sender);
-                        await queue.add({ result, data: result, id, isResponse: true }, this.queueOptions.defaultJobOptions);
-                    } else {
+                        if(sender){
+                            let queue = this.eventHandler.fetchService(sender);
+                            await queue.add({ result, data: result, id, isResponse: true }, this.queueOptions.defaultJobOptions);
+                        }
+                } else {
                         const result = await handler.callback(data);
 
                         // send response back to the sender
-                        let queue = this.eventHandler.fetchService(sender);
-                        await queue.add({ result, data: result, id, isResponse: true }, this.queueOptions.defaultJobOptions);   
-                    }
+                        if(sender){
+                            let queue = this.eventHandler.fetchService(sender);
+                            await queue.add({ result, data: result, id, isResponse: true }, this.queueOptions.defaultJobOptions);   
+                        }
+                }
                     await this.eventHandler.Invoke(job.data);
                 }
                 // if it is an event call
@@ -302,7 +309,7 @@ class Service {
      */
     async sendDecorator(service, path, data, options) {
         let queue = this.eventHandler.fetchService(service);
-        await queue.add({ path, data, isDecorator: true }, options ? options : this.queueOptions.defaultJobOptions);
+        await queue.add({ path, data, isDecorator: true, sender: this.serviceName }, options ? options : this.queueOptions.defaultJobOptions);
     }
 
     static getParameterNames(func) {
