@@ -1,6 +1,6 @@
 const {createService} = require('../index');
 const http = require('http');
-const authService = createService({
+const authService = createService(null, {
     service: 'auth',
     application: 'mrn-application'
 });

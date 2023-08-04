@@ -8,7 +8,7 @@ class getMail {
 
 (async ()=>{
 
-    const storeBuilder = await createService({
+    const storeBuilder = await createService(null, {
         service: 'storeBuilder',
         application: 'mrn-application'
     });
