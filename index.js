@@ -1,7 +1,7 @@
 const Queue = require('bull');
 const EventHandler = require('./event');
 const fs = require('fs');
-const {v4} = require('uuid');
+const { v4 } = require('uuid');
 
 
 let serviceHandlerPromises = [];
@@ -46,8 +46,6 @@ class Service {
     instance;
 
     container;
-    
-    classMap = {};
 
     /**
      * The name of the service
@@ -66,9 +64,12 @@ class Service {
         }
     }
 
-    constructor(config, container) {
+    constructor(container, config) {
 
         this.handlers = {};
+        if (!container) {
+            throw new Error('No container provided');
+        }
         this.container = container;
 
         if (!config) {
@@ -94,9 +95,9 @@ class Service {
         this.eventHandler = new EventHandler(config, this.queueOptions.defaultJobOptions);
 
         this.queue.process(async (job, done) => {
-            const { path, data, IsEventCall, id, sender, isResponse, target } = job.data;
-            
-            if(isResponse){
+            const { path, data, IsEventCall, id, sender, isResponse } = job.data;
+
+            if (isResponse) {
                 await this.eventHandler.handleResponse(id, data);
                 done();
                 return;
@@ -107,23 +108,24 @@ class Service {
 
                 // if it is not a response call, and there is a handler
                 if (!isResponse && handler && !IsEventCall) {
-                    if(handler.isDecorator){
-                        const result = await handler.callback(...(Object.values(data)));
-
-                        // send response back to the sender
-                        if(sender){
+                    if (handler.isDecorator) {
+                        if (!handler.target) {
+                            handler.target = this.container.get(handler.classType);
+                        }
+                        const result = await handler.target[handler.functionName](...(Object.values(data)));
+                        if (sender) {
                             let queue = this.eventHandler.fetchService(sender);
                             await queue.add({ result, data: result, id, isResponse: true }, this.queueOptions.defaultJobOptions);
                         }
-                } else {
+                    } else {
                         const result = await handler.callback(data);
 
                         // send response back to the sender
-                        if(sender){
+                        if (sender) {
                             let queue = this.eventHandler.fetchService(sender);
-                            await queue.add({ result, data: result, id, isResponse: true }, this.queueOptions.defaultJobOptions);   
+                            await queue.add({ result, data: result, id, isResponse: true }, this.queueOptions.defaultJobOptions);
                         }
-                }
+                    }
                     await this.eventHandler.Invoke(job.data);
                 }
                 // if it is an event call
@@ -136,12 +138,11 @@ class Service {
                 }
                 done();
             } catch (error) {
-                // we need to do something here
+                console.log(error);
                 done(error);
             }
         })
         this.sync();
-        //console.log('constructor')
     }
 
 
@@ -196,13 +197,15 @@ class Service {
      * @param path 
      * @param handler 
      */
-    async registerDecorator(path, func) {
-        if (this.handlers.hasOwnProperty(func.name)) {
+    async registerDecorator(path, func, target) {
+        if (this.handlers.hasOwnProperty(func)) {
             console.error('A handler for this function already exists');
             return;
         }
         this.handlers[path] = {
-            callback: func,
+            // callback: func,
+            functionName: func,
+            classType: target.constructor,
             isDecorator: true
         };
     }
@@ -213,7 +216,6 @@ class Service {
      * @param func
      */
     async registerHandler(path, func) {
-        console.log(path, func);
         if (this.handlers.hasOwnProperty(path)) {
             console.error(`A handler for this function "${path}" already exists`);
             return;
@@ -265,7 +267,7 @@ class Service {
         await this.subscribe(type, callback);
     }
 
-    call(service, route, data){
+    call(service, route, data) {
         return this.send(service, route.name, data);
     }
 
@@ -292,9 +294,9 @@ class Service {
         return await this.processCallback(id);
     }
 
-    processCallback(id){
+    processCallback(id) {
         return new Promise(async (resolve, reject) => {
-            await this.eventHandler.registerCallbackStack(id, (data)=>{
+            await this.eventHandler.registerCallbackStack(id, (data) => {
                 resolve(data);
             });
         });
@@ -323,10 +325,8 @@ class Service {
 
 const serviceFunction = (target, name, descriptor) => {
     serviceHandlerPromises.push(async () => {
-
         const paramNames = Service.getParameterNames(descriptor.value);
-
-        Service.instance.registerDecorator(name, descriptor.value);
+        Service.instance.registerDecorator(name, descriptor.value.name, target);
         let methodKey = `${Service.instance.rootKey}:${name}`;
 
         Service.instance.eventHandler.registerRouteDefinitions(methodKey, paramNames)
@@ -336,7 +336,6 @@ const serviceFunction = (target, name, descriptor) => {
 
 const subscribeFunction = (instance) => {
     return (target, name, descriptor) => {
-        //console.log(instance.name, 'SUBSCRIBE');
         eventRegisterPromises.push(async () => {
             if (instance) {
                 Service.instance.subscribe(instance.name, descriptor.value);
@@ -350,7 +349,7 @@ const subscribeFunction = (instance) => {
 }
 
 const createService = (config) => {
-    if(Service.instance){
+    if (Service.instance) {
         return Service.instance;
     }
     Service.instance = new Service(config);
