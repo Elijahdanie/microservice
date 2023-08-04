@@ -47,6 +47,8 @@ class Service {
 
     container;
 
+    defaultContainer = {};
+
     /**
      * The name of the service
      */
@@ -68,7 +70,7 @@ class Service {
 
         this.handlers = {};
         if (!container) {
-            throw new Error('No container provided');
+            console.log("WARNING: no container provided, using default container, attach container to service to use dependency injection, default container may not keep track of your dependencies");
         }
         this.container = container;
 
@@ -109,10 +111,18 @@ class Service {
                 // if it is not a response call, and there is a handler
                 if (!isResponse && handler && !IsEventCall) {
                     if (handler.isDecorator) {
-                        if (!handler.target) {
-                            handler.target = this.container.get(handler.classType);
+                        let result = null;
+                        if(handler.callback){
+                            result = await handler.callback(data);
+                        } else {
+                            if (!handler.target && this.container) {
+                                handler.target = this.container.get(handler.classType);
+                            }
+                            if(!handler.target && !this.container){
+                                handler.target = new handler.classType();
+                            }
+                            result = await handler.target[handler.functionName](...(Object.values(data)));
                         }
-                        const result = await handler.target[handler.functionName](...(Object.values(data)));
                         if (sender) {
                             let queue = this.eventHandler.fetchService(sender);
                             await queue.add({ result, data: result, id, isResponse: true }, this.queueOptions.defaultJobOptions);
@@ -348,11 +358,11 @@ const subscribeFunction = (instance) => {
     }
 }
 
-const createService = (config) => {
+const createService = (container, config) => {
     if (Service.instance) {
         return Service.instance;
     }
-    Service.instance = new Service(config);
+    Service.instance = new Service(container, config);
     return Service.instance;
 }
 
