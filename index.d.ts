@@ -62,5 +62,5 @@ declare function subscribeFunction<T>(instance: new ()=>T): (target: any, name: 
  * @param sync 
  * @param config 
  */
-declare function createService(config?: ServiceConfig): Service;
+declare function createService(container: any, config?: ServiceConfig): Service;
 export {Service, createService, serviceFunction, subscribeFunction};
