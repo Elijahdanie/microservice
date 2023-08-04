@@ -4,7 +4,7 @@ const {createService} = require('../index');
 
 (async ()=>{
 
-    const logger = await createService({
+    const logger = await createService(null,{
         service: 'logger',
         application: 'mrn-application'
     });
