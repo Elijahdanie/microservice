@@ -29,23 +29,26 @@ edit the redis configuration to point to your redis server
 ## 2. Import and create Service
 
 Import the createService function and call it to create a service
+To make use of the decorators, you'll need to provide a dependency manager like typdi in the createService function
 ```typescript
 import {createService} from 'microservice-redis-net';
+import Container from 'typedi';
 
 // example
-const exampleService = createService ();
+const exampleService = createService (Container);
 ```
 
 You can also pass in a config object if the config file is not in the root directory
 ```typescript
 import {createService} from 'microservice-redis-net';
+import Container from 'typedi'
 
 // example
-const exampleService = createService ({
+const exampleService = createService (Container, {
     application: "example",
     service: "example-service",
-    queue:{
-        redis:{
+    queue: {
+        redis: {
             host: "localhost",
             port: 6379
         }
@@ -97,7 +100,7 @@ exmple.exampleFunction({data: "example data"})
     });
 
 // can as well make a custom call
-import Service from 'microservice-redis-net';
+import { Service } from 'microservice-redis-net';
 Service.instance.call(exampleSubscribe, {data: "example data"});
 
 // Can also invoke with the type function exampleSubscribe
@@ -155,8 +158,13 @@ await service.invokeEvent('event_route', {data: "exampledata"});
 ```
 
 ## NOTE
+- This package is still in beta and not very stable for production environment, it might undergo few changes in future iterations
+
 - If you're using typescript, you need to enable the experimentalDecorators and emitDecoratorMetadata compiler options in your tsconfig.json file.
 
 - Run mrn init to generate a config file so you can manage your configuration in one place
 
 - Run mrn pull to generate a client file to invoke functions
+
+- To make use of the decorators efficiently, you'll need to use a dependency injection manager, this package supports typedi
+
