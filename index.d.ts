@@ -24,20 +24,48 @@ declare class Service {
   constructor(config?: ServiceConfig);
 
   /**
-   * register a handler for a function
+   * register a handler for a function with a string key
    * @param path 
    * @param handler 
    */
-  registerHandler(func: string, handler: (...args) => any): Promise<void>;
+  registerHandler(func: string, handler: (...args: any) => any): Promise<void>;
 
-  registerFunction(handler: (...args) => any): Promise<void>;
+
+  /**
+   * register a handler via named function
+   * @param path
+   * @param handler
+   */
+  registerFunction(handler: (...args: any) => any): Promise<void>;
   
+  /**
+   * Invokes an event and passes argument data
+   * @param func
+   * @param data
+   */
   invokeEvent(func: string, data: any): Promise<Job<any>>;
 
+  /**
+   * Invokes an event and passes argument data by type T
+   * @param route
+   * @param data
+   */
   Invoke <T>(route: new()=>T, data: T): Promise<void>;
 
+  /**
+   * Subscribes to a function via string key
+   * @param func
+   * @param handler
+   */
   subscribe(func: string, handler: (data: any) => Promise<any>): Promise<void>;
 
+  /**
+   * Sends a message to a service via string key
+   * @param service
+   * @param func
+   * @param data
+   * @param options
+   */
   send(service: string, func: string, data: any, options?: Bull.JobOptions): Promise<void>;
 
   sendDecorator(service: string, func: string, data: any, options?: Bull.JobOptions): Promise<void>;
@@ -55,12 +83,6 @@ declare function serviceFunction(
 
 declare function subscribeFunction<T>(instance: new ()=>T): (target: any, name: string, descriptor: PropertyDescriptor) => PropertyDescriptor;
 
-
-
-/**
- * set sync to true if you're using decorators
- * @param sync 
- * @param config 
- */
 declare function createService(container: any, config?: ServiceConfig): Service;
+
 export {Service, createService, serviceFunction, subscribeFunction};
