@@ -125,15 +125,15 @@ class Service {
                         }
                         if (sender) {
                             let queue = this.eventHandler.fetchService(sender);
-                            await queue.add({ result, data: result, id, isResponse: true }, this.queueOptions.defaultJobOptions);
+                            await queue.add({ data: result, id, isResponse: true }, this.queueOptions.defaultJobOptions);
                         }
                     } else {
-                        const result = await handler.callback(data);
+                        result = await handler.callback(data);
 
                         // send response back to the sender
                         if (sender) {
                             let queue = this.eventHandler.fetchService(sender);
-                            await queue.add({ result, data: result, id, isResponse: true }, this.queueOptions.defaultJobOptions);
+                            await queue.add({ data: result, id, isResponse: true }, this.queueOptions.defaultJobOptions);
                         }
                     }
                     await this.eventHandler.Invoke(job.data);
@@ -277,8 +277,8 @@ class Service {
         await this.subscribe(type, callback);
     }
 
-    call(service, route, data) {
-        return this.send(service, route.name, data);
+    call(service, route, data, IsCallback=false) {
+        return IsCallback ? this.send(service, route.name, data) : this.sendNoCallback(service, route.name, data);
     }
 
     /**
@@ -302,6 +302,12 @@ class Service {
         let id = v4();
         await queue.add({ path, data, id, sender: this.serviceName }, options ? options : this.queueOptions.defaultJobOptions);
         return await this.processCallback(id);
+    }
+
+    async sendNoCallback(service, path, data, options) {
+        let queue = this.eventHandler.fetchService(service);
+        let id = v4();
+        await queue.add({ path, data, id}, options ? options : this.queueOptions.defaultJobOptions);
     }
 
     processCallback(id) {

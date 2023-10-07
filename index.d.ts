@@ -72,7 +72,7 @@ declare class Service {
 
   subscribe <T>(route: new()=>T, callback: (data: T) => Promise<void>): Promise<void>;
 
-  call <T>(service: string, route: new()=>T, data: T): Promise<void>;
+  call <T>(service: string, route: new()=>T, data: T, isCallback?: boolean): Promise<void>;
 }
 
 declare function serviceFunction(
