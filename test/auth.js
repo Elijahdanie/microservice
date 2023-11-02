@@ -5,6 +5,8 @@ const authService = createService(null, {
     application: 'mrn-application'
 });
 
+// console.log(JSON.stringify(authService), "SERVICE");
+
 class createUser {
     name = "";
     email = "";

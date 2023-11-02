@@ -1,21 +1,24 @@
 const ioredis = require('ioredis');
-const Queue = require('bull');
-const fs = require('fs');
+// const Queue = require('bull');
+// const fs = require('fs');
+// const RabbitMq = require('./rabbitmq');
 
 class EventHandler {
 
     redisDb;
     services = {};
-    redisConfig;
+    // redisConfig;
     defaultOptions;
     manifest;
     callbackStacks = {};
+    Broker;
 
 
-    constructor(config, options){
+    constructor(options, Broker){
         this.defaultOptions = options;
-        this.redisConfig = config;
-        this.redisDb = new ioredis(this.redisConfig);
+        this.Broker = Broker;
+        // this.redisConfig = config;
+        this.redisDb = new ioredis(this.defaultOptions);
         this.manifest = {}
     }
 
@@ -25,7 +28,7 @@ class EventHandler {
         const services = await this.redisDb.smembers(path);
         // for each service, send the data
         for(const service of services){
-            let serviceQueue = this.fetchService(service);
+            let serviceQueue = await this.fetchService(service);
             await serviceQueue.add({path, data, IsEventCall: true}, this.defaultOptions);
         }
         
@@ -73,9 +76,15 @@ class EventHandler {
         await this.redisDb.set(methodName, JSON.stringify(paramNames));
     }
 
-    fetchService(service){
+    async fetchService(service){
         if(!this.services[service]){
-            this.services[service] = new Queue(service, this.redisConfig);
+            // console.log(this.defaultOptions);
+            this.services[service] = new this.Broker(service, this.defaultOptions);
+            await new Promise((resolve, reject)=>{
+                setTimeout(() => {
+                    resolve();
+                }, 1000);
+            });
         }
         return this.services[service];
     }

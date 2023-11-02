@@ -7,9 +7,9 @@ let artifialPromise = (data)=>{
         }, 3000);
     })
 }
-(async ()=>{
 
-    const emailService = createService(null,{
+(async ()=>{
+    const emailService = await createService(null,{
         service: 'email',
         application: 'mrn-application',
     });

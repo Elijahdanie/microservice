@@ -2,6 +2,7 @@ const Queue = require('bull');
 const EventHandler = require('./event');
 const fs = require('fs');
 const { v4 } = require('uuid');
+const RabbitMq = require('./rabbitmq');
 
 
 let serviceHandlerPromises = [];
@@ -55,7 +56,7 @@ class Service {
     serviceName;
 
     queueOptions = {
-        redis: {
+        server: {
             host: 'localhost',
             port: 6379
         },
@@ -67,7 +68,6 @@ class Service {
     }
 
     constructor(container, config) {
-
         this.handlers = {};
         if (!container) {
             console.log("WARNING: no container provided, using default container, attach container to service to use dependency injection, default container may not keep track of your dependencies");
@@ -93,8 +93,9 @@ class Service {
             return;
         }
         this.rootKey = `mrn:${config.application}:${this.serviceName}`;
-        this.queue = new Queue(this.serviceName, config.queue ? config.queue : this.queueOptions);
-        this.eventHandler = new EventHandler(config, this.queueOptions.defaultJobOptions);
+        const Broker = config.broker === 'bull' ? Queue : RabbitMq;
+        this.queue = new Broker(this.serviceName, config.queue ? config.queue : this.queueOptions);
+        this.eventHandler = new EventHandler(config.queue ? config.queue : this.queueOptions, Broker);
 
         this.queue.process(async (job, done) => {
             const { path, data, IsEventCall, id, sender, isResponse } = job.data;
@@ -298,16 +299,16 @@ class Service {
      * Send data to a service
      */
     async send(service, path, data, options) {
-        let queue = this.eventHandler.fetchService(service);
+        let queue = await this.eventHandler.fetchService(service);
         let id = v4();
         await queue.add({ path, data, id, sender: this.serviceName }, options ? options : this.queueOptions.defaultJobOptions);
         return await this.processCallback(id);
     }
 
     async sendNoCallback(service, path, data, options) {
-        let queue = this.eventHandler.fetchService(service);
+        let queue = await this.eventHandler.fetchService(service);
         let id = v4();
-        await queue.add({ path, data, id}, options ? options : this.queueOptions.defaultJobOptions);
+        await queue.add({ path, data, id}, options ? options : this.queueOptions);
     }
 
     processCallback(id) {

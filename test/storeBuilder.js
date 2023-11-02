@@ -38,7 +38,7 @@ class getMail {
     }
     
     async function vgetMail(count, data){
-        storeBuilder.call('email', getMail, {
+        await storeBuilder.call('email', getMail, {
             to: data.email,
             subject: "Welcome to our service",
             body: "Your store is ready"

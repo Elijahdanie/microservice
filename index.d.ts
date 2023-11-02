@@ -1,21 +1,40 @@
-import Bull, { Job, QueueOptions } from 'bull';
+import Bull, { Job } from 'bull';
 
 interface JobRequest {
     func: string;
     data: any;
 }
 
+
+interface QueueOptions {
+  server: {
+      host: string,
+      port: number
+  },
+  defaultJobOptions: {
+      attempts: number
+      removeOnComplete: boolean,
+      removeOnFail: boolean
+  }
+}
+
   interface ServiceConfig {
     application: string,
     service?: string,
+    broker: 'bull' | 'rabbitmq'
     queue?: QueueOptions
+  }
+
+  interface RabbitMq {
+    process: (callback : (job: {data:any}) => Promise<any>) => void;
+    add: (data: any) => Promise<any>;
   }
 
   //declare a decorator
 
 
 declare class Service {
-  queue: Bull.Queue;
+  queue: Bull.Queue | RabbitMq;
   static instance: Service;
   // handlers: {
   //   [path: string]: (job: JobRequest) => Promise<any>;
