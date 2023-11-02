@@ -94,7 +94,17 @@ class Service {
         }
         this.rootKey = `mrn:${config.application}:${this.serviceName}`;
         const Broker = config.broker === 'bull' ? Queue : RabbitMq;
-        this.queue = new Broker(this.serviceName, config.queue ? config.queue : this.queueOptions);
+
+        let finalConfig = config.queue ? config.queue : this.queueOptions;
+
+        finalConfig = {
+            [config.broker === 'bull' ? 'redis' : 'server']: finalConfig['server'],
+            defaultJobOptions: finalConfig.defaultJobOptions
+        }
+
+        console.log('finalConfig', finalConfig);
+
+        this.queue = new Broker(this.serviceName, finalConfig);
         this.eventHandler = new EventHandler(config.queue ? config.queue : this.queueOptions, Broker);
 
         this.queue.process(async (job, done) => {

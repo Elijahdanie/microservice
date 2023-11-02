@@ -47,7 +47,7 @@ import Container from 'typedi'
 const exampleService = createService (Container, {
     application: "example",
     service: "example-service",
-    broker: 'redi' | 'rabbitmq',
+    broker: 'redis' | 'rabbitmq',
     queue: {
         server: {
             host: "localhost",
