@@ -101,7 +101,7 @@ class EventHandler {
     }
 
     async resolveManifest(service){
-        
+        console.log(service);
         let manifestKey = `${service}-manifest`
         let manfifestFile = await this.redisDb.get(manifestKey);
 

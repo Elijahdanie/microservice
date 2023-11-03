@@ -46,8 +46,22 @@ class Service {
 
     instance;
 
+    /**
+     * The container that will be used to resolve dependencies
+     * If no container is provided, a default container will be used
+     * This container will not keep track of dependencies
+     * and will not be able to resolve dependencies
+     * This is only used for testing purposes
+     * @param {*} container 
+     */
     container;
 
+    /**
+     * The default container that will be used if no container is provided
+     * This container will not keep track of dependencies
+     * and will not be able to resolve dependencies
+     * This is only used for testing purposes
+     */
     defaultContainer = {};
 
     /**
@@ -95,75 +109,81 @@ class Service {
         this.rootKey = `mrn:${config.application}:${this.serviceName}`;
         const Broker = config.broker === 'bull' ? Queue : RabbitMq;
 
-        let finalConfig = config.queue ? config.queue : this.queueOptions;
+        let tempConfig = config.queue ? config.queue : this.queueOptions;
 
-        finalConfig = {
-            [config.broker === 'bull' ? 'redis' : 'server']: finalConfig['server'],
-            defaultJobOptions: finalConfig.defaultJobOptions
+        let editedConfig = {
+            [config.broker === 'bull' ? 'redis' : 'server']: tempConfig['server'],
+            defaultJobOptions: tempConfig.defaultJobOptions
         }
 
-        console.log('finalConfig', finalConfig);
-
-        this.queue = new Broker(this.serviceName, finalConfig);
+        this.queue = new Broker(this.serviceName, editedConfig);
         this.eventHandler = new EventHandler(config.queue ? config.queue : this.queueOptions, Broker);
 
-        this.queue.process(async (job, done) => {
-            const { path, data, IsEventCall, id, sender, isResponse } = job.data;
-
-            if (isResponse) {
-                await this.eventHandler.handleResponse(id, data);
-                done();
-                return;
-            }
-
-            try {
-                const handler = this.handlers[path];
-
-                // if it is not a response call, and there is a handler
-                if (!isResponse && handler && !IsEventCall) {
-                    if (handler.isDecorator) {
-                        let result = null;
-                        if(handler.callback){
-                            result = await handler.callback(data);
-                        } else {
-                            if (!handler.target && this.container) {
-                                handler.target = this.container.get(handler.classType);
-                            }
-                            if(!handler.target && !this.container){
-                                handler.target = new handler.classType();
-                            }
-                            result = await handler.target[handler.functionName](...(Object.values(data)));
-                        }
-                        if (sender) {
-                            let queue = this.eventHandler.fetchService(sender);
-                            await queue.add({ data: result, id, isResponse: true }, this.queueOptions.defaultJobOptions);
-                        }
-                    } else {
-                        result = await handler.callback(data);
-
-                        // send response back to the sender
-                        if (sender) {
-                            let queue = this.eventHandler.fetchService(sender);
-                            await queue.add({ data: result, id, isResponse: true }, this.queueOptions.defaultJobOptions);
-                        }
-                    }
-                    await this.eventHandler.Invoke(job.data);
-                }
-                // if it is an event call
-                else if (!isResponse && IsEventCall) {
-                    if (this.eventFunctions[path]) {
-                        for (let j = 0; j < this.eventFunctions[path].length; j++) {
-                            this.eventFunctions[path][j](data);
-                        }
-                    }
-                }
-                done();
-            } catch (error) {
-                console.log(error);
-                done(error);
-            }
-        })
+        this.queue.process(this.processJob);
         this.sync();
+    }
+
+
+    processJob = async (job, done) => {
+        const { path, data, IsEventCall, id, sender, isResponse } = job.data;
+
+        if (isResponse) {
+            await this.eventHandler.handleResponse(id, data);
+            done();
+            return;
+        }
+
+        try {
+            const handler = this.handlers[path];
+
+            // if it is not a response call, and there is a handler
+            if (!isResponse && handler && !IsEventCall) {
+                await this.processHandler(handler, data, sender, job);
+            }
+            // if it is an event call
+            else if (!isResponse && IsEventCall) {
+                if (this.eventFunctions[path]) {
+                    for (let j = 0; j < this.eventFunctions[path].length; j++) {
+                        this.eventFunctions[path][j](data);
+                    }
+                }
+            }
+            done();
+        } catch (error) {
+            console.log(error);
+            done(error);
+        }
+    }
+
+
+    processHandler = async (handler, data, sender, job) => {
+        if (handler.isDecorator) {
+            let result = null;
+            if(handler.callback){
+                result = await handler.callback(data);
+            } else {
+                if (!handler.target && this.container) {
+                    handler.target = this.container.get(handler.classType);
+                }
+                if(!handler.target && !this.container){
+                    handler.target = new handler.classType();
+                }
+                result = await handler.target[handler.functionName](...(Object.values(data)));
+            }
+            if (sender) {
+                let queue = this.eventHandler.fetchService(sender);
+                await queue.add({ data: result, id, isResponse: true }, this.queueOptions.defaultJobOptions);
+            }
+        } else {
+            result = await handler.callback(data);
+
+            // send response back to the sender
+            if (sender) {
+                let queue = this.eventHandler.fetchService(sender);
+                await queue.add({ data: result, id, isResponse: true }, this.queueOptions.defaultJobOptions);
+            }
+        }
+        await this.eventHandler.Invoke(job.data);
     }
 
 
@@ -172,7 +192,7 @@ class Service {
      * This will register all the handlers and events
      * with the event handler
      */
-    async sync() {
+    sync = async ()=> {
 
         await this.eventHandler.init(this.rootKey);
 
@@ -185,7 +205,7 @@ class Service {
         }));
 
         //resolve the manifest here
-        await this.eventHandler.resolveManifest();
+        await this.eventHandler.resolveManifest(this.serviceName);
     }
 
     /**
