@@ -107,7 +107,7 @@ class Service {
             return;
         }
         this.rootKey = `mrn:${config.application}:${this.serviceName}`;
-        const Broker = config.broker === 'bull' ? Queue : RabbitMq;
+        const Broker = config.broker === 'rabbitmq' ? RabbitMq : Queue;
 
         let tempConfig = config.queue ? config.queue : this.queueOptions;
 
