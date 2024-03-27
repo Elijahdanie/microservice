@@ -1,7 +1,7 @@
 const { exec } = require('child_process');
 const {Worker} = require('worker_threads');
 
-exec('redis-server');
+exec('redis-server --daemonize yes');
 
 const email = new Worker('./test/email.js');
 const logger = new Worker('./test/logger.js');

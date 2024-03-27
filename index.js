@@ -3,6 +3,7 @@ const EventHandler = require('./event');
 const fs = require('fs');
 const { v4 } = require('uuid');
 const RabbitMq = require('./rabbitmq');
+const InitSwarm = require('./locust');
 
 
 let serviceHandlerPromises = [];
@@ -410,4 +411,5 @@ module.exports = {
     createService,
     serviceFunction,
     subscribeFunction,
+    InitSwarm
 };

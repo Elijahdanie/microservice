@@ -1,4 +1,5 @@
 import Bull, { Job } from 'bull';
+import { Server, Socket } from 'socket.io';
 
 interface JobRequest {
     func: string;
@@ -28,6 +29,10 @@ interface QueueOptions {
   interface RabbitMq {
     process: (callback : (job: {data:any}) => Promise<any>) => void;
     add: (data: any) => Promise<any>;
+  }
+
+  interface LocusSocket {
+    socket: Socket
   }
 
   //declare a decorator
@@ -104,4 +109,6 @@ declare function subscribeFunction<T>(instance: new ()=>T): (target: any, name: 
 
 declare function createService(container: any, config?: ServiceConfig): Service;
 
-export {Service, createService, serviceFunction, subscribeFunction};
+declare function InitSwarm(application: string, url: string, io: Server, onConnection: (socket: LocusSocket)=> Promise<LocusSocket>, auth: (token: string)=> bool);
+
+export {Service, createService, serviceFunction, subscribeFunction, InitSwarm};
